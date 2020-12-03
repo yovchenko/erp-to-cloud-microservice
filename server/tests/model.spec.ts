@@ -1,4 +1,3 @@
-import { response } from "express";
 import Model, { sqlQuery } from "../source/model";
 
 // eslint-disable-next-line @typescript-eslint/camelcase

@@ -85,3 +85,13 @@ export default function checkEvent(item: {
     }
   }
 }
+
+import { sqlQuery } from "./model";
+
+sqlQuery("SELECT folder_id FROM Folders WHERE title = 'Root'")
+  .then(response => {
+    console.log(response);
+  })
+  .catch(err => {
+    console.error(err);
+  });

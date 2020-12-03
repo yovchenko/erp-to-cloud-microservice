@@ -13,7 +13,7 @@
     "build:server": "webpack --config server.config.js",
     "start": "node server/dist/index.js",
     "start:dev": "nodemon server/dist/index.js",
-    "test:server": "jest"
+    "test:server": "jest --detectOpenHandles"
   },
   "private": true,
   "dependencies": {
@@ -23,6 +23,7 @@
     "googleapis": "^65.0.0",
     "helmet": "^3.21.3",
     "nodemailer": "^6.4.11",
+    "pg": "^8.4.0",
     "rxjs": "~6.5.4",
     "xmlhttprequest": "^1.8.0"
   },
@@ -47,7 +48,6 @@
     "ts-loader": "^6.2.1",
     "ts-node": "~8.3.0",
     "tslib": "^1.10.0",
-    "tslint": "~5.18.0",
     "typescript": "^3.8.3",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11",
