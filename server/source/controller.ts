@@ -88,16 +88,10 @@ export default function checkEvent(item: {
 
 import { sqlQuery } from "./model";
 
-sqlQuery("SELECT DISTINCT erp_work_type FROM Spaces_info")
+sqlQuery(`SELECT DISTINCT erp_work_type FROM Spaces_info`)
   .then(response => {
     console.log(response);
   })
   .catch(err => {
     console.error(err);
   });
-
-const workTypes: Array<{ erp_work_type: string }> = [];
-Model.workTypes.forEach(str => {
-  // eslint-disable-next-line @typescript-eslint/camelcase
-  workTypes.push(Object.assign({ erp_work_type: str }));
-});

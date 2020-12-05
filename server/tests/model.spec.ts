@@ -19,15 +19,27 @@ describe("unit tests for PostgreSQL database", () => {
     ).resolves.toStrictEqual(root);
   });
 
-  test("should throw a syntax error", () => {
-    expect(
-      sqlQuery("SELECT FROM Folders WHERE title = 'Root'")
-    ).rejects.toThrow();
+  test("should throw a syntax error", async () => {
+    await expect(sqlQuery("SELECTFROM Folders")).rejects.toThrow();
   });
 
   test("should resolve an array of ERP's work types", () => {
-    expect(
+    return expect(
       sqlQuery("SELECT DISTINCT erp_work_type FROM Spaces_info")
     ).resolves.toEqual(expect.arrayContaining(workTypes));
+  });
+
+  test("should", () => {
+    return expect(
+      sqlQuery(`SELECT inf.project_title, 
+      wf.prop_hidden 
+      FROM Spaces_info AS inf 
+      LEFT JOIN Workflows AS wf 
+      ON inf.workflow_id = wf.workflow_id 
+      WHERE project_title = '(Монтаж)' 
+      GROUP BY project_title, prop_hidden;`)
+    ).resolves.toEqual(
+      expect.arrayContaining([expect.objectContaining({ prop_hidden: true })])
+    );
   });
 });
