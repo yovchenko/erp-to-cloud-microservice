@@ -85,13 +85,3 @@ export default function checkEvent(item: {
     }
   }
 }
-
-import { sqlQuery } from "./model";
-
-sqlQuery(`SELECT DISTINCT erp_work_type FROM Spaces_info`)
-  .then(response => {
-    console.log(response);
-  })
-  .catch(err => {
-    console.error(err);
-  });

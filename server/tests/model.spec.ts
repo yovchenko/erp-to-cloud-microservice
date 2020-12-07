@@ -13,7 +13,7 @@ beforeAll(async () => {
 });
 
 describe("unit tests for PostgreSQL database", () => {
-  test("should return the root id", () => {
+  test("should resolve the root id as a string", () => {
     return expect(
       sqlQuery("SELECT folder_id FROM Folders WHERE title = 'Root'")
     ).resolves.toStrictEqual(root);
@@ -26,20 +26,21 @@ describe("unit tests for PostgreSQL database", () => {
   test("should resolve an array of ERP's work types", () => {
     return expect(
       sqlQuery("SELECT DISTINCT erp_work_type FROM Spaces_info")
-    ).resolves.toEqual(expect.arrayContaining(workTypes));
+    ).resolves.toEqual(workTypes);
   });
 
-  test("should", () => {
+  test("should resolve SQL join result set", () => {
     return expect(
       sqlQuery(`SELECT inf.project_title, 
       wf.prop_hidden 
       FROM Spaces_info AS inf 
       LEFT JOIN Workflows AS wf 
       ON inf.workflow_id = wf.workflow_id 
-      WHERE project_title = '(Монтаж)' 
       GROUP BY project_title, prop_hidden;`)
     ).resolves.toEqual(
-      expect.arrayContaining([expect.objectContaining({ prop_hidden: true })])
+      expect.arrayContaining([
+        expect.not.objectContaining({ prop_hidden: null })
+      ])
     );
   });
 });

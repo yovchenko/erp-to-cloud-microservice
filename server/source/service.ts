@@ -6,29 +6,6 @@ const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 require("dotenv").config();
 
 /**
- * TypeScript interfaces
- */
-
-interface DataExport {
-  kind: string;
-  data: Resources[];
-}
-
-interface Resources {
-  id: string;
-  completedDate: string;
-  status: string;
-  //"Scheduled"
-  //"Completed"
-  resource: Resource[];
-}
-
-interface Resource {
-  name: string;
-  url: string;
-}
-
-/**
  * Gmail service
  */
 
@@ -49,6 +26,7 @@ export class GmailMessage {
       "https://www.googleapis.com/auth/gmail.send",
       "https://www.googleapis.com/auth/gmail.readonly"
     ];
+
     // The file token.json stores the user's access and refresh tokens, and is
     // created automatically when the authorization flow completes for the first
     // time.
@@ -172,7 +150,6 @@ export class GmailMessage {
     }
 
     function sendMessage(auth: object): void {
-      //console.log("USER = " + this.subject);
       const gmail = google.gmail("v1");
       const raw = makeBody(
         this.user,
@@ -188,8 +165,8 @@ export class GmailMessage {
             raw: raw
           }
         },
-        function(err, response) {
-          console.log(err || response);
+        function(err, res) {
+          console.log(err || res.status);
         }
       );
     }
@@ -299,7 +276,7 @@ export class DataRefresh {
   public hour: number;
   public minute: number;
   public interval: number;
-  private timerId: any; //NodeJS.Timeout;
+  private timerId: NodeJS.Timeout;
   private repeat: (name: void) => void;
   // The first two arguments of the constructor are the start time
   constructor(hour: number, minute: number, interval: number) {
