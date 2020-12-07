@@ -37,34 +37,13 @@ To start the express server, run the following
 Run `npm run test:server` to execute the unit tests via [Jest](https://jestjs.io).
 
 ## Application Structure
-   .                 
+  .
     ├── docs                    # Documentation files (Database description)
-    ├── server 
-    │    ├── dist               # The folder contains Webpack bundling file for production
-    │    │    └── index.js        
-    │    ├── source             # The folder contains the source code
-    │    │    ├── controller.ts   
-    │    │    ├── erpDataExchange.ts
-    │    │    ├── index.ts         
-    │    │    ├── interfaces.ts   
-    │    │    ├── model.ts        
-    │    │    ├── routes.ts       
-    │    │    ├── service.ts
-    │    │    └── wrikeDataExchange.ts  
-    │    └── tests              # The folder contains the unit tests 
-    │        ├── erpDataExchange.spec.ts    
-    │        ├── model.spec.ts              
-    │        └── service.spec.ts            
-    ├── .eslintignore           
-    ├── .eslintrc 
-    ├── .gitignore   
-    ├── jest.config.js 
-    ├── LICENSE
-    ├── ngrok
-    ├── package.json 
-    ├── README.md
-    ├── server.config.js 
-    └── tsconfig.json
+    ├── server                               
+    │   ├── dist                # The folder contains Webpack bundling file for production
+    │   ├── source              # The folder contains the source code
+    │   └── test                # The folder contains the unit tests 
+    └── ...
 
 ## Authentication
 
