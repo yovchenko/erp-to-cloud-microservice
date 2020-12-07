@@ -5,9 +5,9 @@
 export interface CustomField {
   id: string;
   value: string;
-  type: string;
-  title: string;
-  settings: {
+  type?: string;
+  title?: string;
+  settings?: {
     inheritanceType: string;
   };
 }
@@ -30,11 +30,11 @@ export interface CustomFields {
 export interface Project {
   id: string;
   title: string;
-  workflowId: string;
-  parentIds: string[];
-  childIds: string[];
-  customFields: CustomField[];
-  permalink: string;
+  workflowId?: string;
+  parentIds?: string[];
+  childIds?: string[];
+  customFields?: CustomField[];
+  permalink?: string;
 }
 
 export interface Task {

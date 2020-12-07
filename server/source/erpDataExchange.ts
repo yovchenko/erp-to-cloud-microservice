@@ -13,8 +13,8 @@ require("dotenv").config();
  */
 
 //The function that update ERP's data information table in Wrike
-export function checkErpData(): Promise<string> {
-  const promise = new Promise<string>((resolve, reject) => {
+export function checkErpData(): Promise<interfaces.Tasks> {
+  const promise = new Promise<interfaces.Tasks>((resolve, reject) => {
     //request Wrike's space Id that is stored in the database
     return sqlQuery("SELECT space_id FROM Spaces WHERE title = '1C'")
       .then((response: [{ space_id: string }]) => {
@@ -80,7 +80,7 @@ export function checkErpData(): Promise<string> {
           } else throw "The task folder not found!";
         }
         table = null; //Release the object from the memory
-        resolve(response);
+        resolve(tasks);
       })
       .catch(error => {
         reject("The last step in the promise chain returns an error: " + error);
@@ -728,65 +728,29 @@ function setProjectsWithOrder(
                       response[i].erp_work_type
                     )
                   ) {
-                    if (
-                      groupedProjects[key][index].workflowId ===
-                      response[i].workflow_id
-                    ) {
-                      //The data structure singularity handling
-                      if (
-                        response[i].erp_work_type === Model.workTypes[5] ||
-                        response[i].erp_work_type === Model.workTypes[6]
-                      ) {
-                        if (response[i].erp_work_type === Model.workTypes[5]) {
-                          if (
-                            Object.prototype.hasOwnProperty.call(
-                              totalBudget[num],
-                              Model.workTypes[6]
-                            )
-                          ) {
-                            totalBudget[num][Model.workTypes[5]] +=
-                              totalBudget[num][Model.workTypes[6]];
-                            delete totalBudget[num][Model.workTypes[6]];
-                          }
-                        } else {
-                          if (
-                            Object.prototype.hasOwnProperty.call(
-                              totalBudget[num],
-                              Model.workTypes[5]
-                            )
-                          ) {
-                            totalBudget[num][Model.workTypes[6]] +=
-                              totalBudget[num][Model.workTypes[5]];
-                            delete totalBudget[num][Model.workTypes[5]];
-                          }
-                        }
-                      }
-                      //Assign ERP's budget data to Wrike's project folder using the PUT method
-                      await requestHttp(
-                        "PUT",
-                        encodeURI(
-                          process.env.WRIKE_FOLDERS +
-                            "/" +
-                            groupedProjects[key][index].id +
-                            "?customFields=[{'id': '" +
-                            Model.customField[10] +
-                            "', 'value': '" +
-                            totalBudget[num][response[i].erp_work_type] +
-                            "'}]"
-                        )
+                    //Assign ERP's budget data to Wrike's project folder using the PUT method
+                    await requestHttp(
+                      "PUT",
+                      encodeURI(
+                        process.env.WRIKE_FOLDERS +
+                          "/" +
+                          groupedProjects[key][index].id +
+                          "?customFields=[{'id': '" +
+                          Model.customField[10] +
+                          "', 'value': '" +
+                          totalBudget[num][response[i].erp_work_type] +
+                          "'}]"
                       )
-                        .then((response: string) => {
-                          const folders: interfaces.Folder = JSON.parse(
-                            response
-                          );
-                          result.push(folders.data[0].id);
-                        })
-                        .catch(err => {
-                          reject(
-                            "Update ERP's budget data PUT request error: " + err
-                          );
-                        });
-                    }
+                    )
+                      .then((response: string) => {
+                        const folders: interfaces.Folder = JSON.parse(response);
+                        result.push(folders.data[0].id);
+                      })
+                      .catch(err => {
+                        reject(
+                          "Update ERP's budget data PUT request error: " + err
+                        );
+                      });
                   }
                 }
               }
@@ -891,7 +855,7 @@ function sumBudget(
 }
 
 //The function returns an array of Wrike's projects grouped by key
-function projectGroupBy(
+export function projectGroupBy(
   array: interfaces.Project[],
   key: string
 ): interfaces.GroupedProjects {

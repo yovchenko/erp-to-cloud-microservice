@@ -1,5 +1,5 @@
 import { GmailMessage } from "../source/service";
-const consoleSpy = jest.spyOn(console, "log").mockImplementation();
+const consoleErr = jest.spyOn(console, "log").mockImplementation();
 
 let createMessage: GmailMessage;
 
@@ -12,9 +12,9 @@ beforeAll(async () => {
   );
 });
 
-describe("Verify the console.log is called after a message sent", () => {
+describe("verify the console.log is called after a message sent", () => {
   beforeEach(() => {
-    consoleSpy.mockClear();
+    consoleErr.mockClear();
   });
   test("should print status OK", () => {
     createMessage.gmailMessage(createMessage);
