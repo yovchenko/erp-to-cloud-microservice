@@ -34,27 +34,27 @@ To start the express server, run the following
 
 ## Running unit tests
 
-Run `test:server` to execute the unit tests via [Jest](https://jestjs.io).
+Run `npm run test:server` to execute the unit tests via [Jest](https://jestjs.io).
 
 ## Application Structure
    .                 
     ├── docs                    # Documentation files (Database description)
     ├── server 
-        ├── dist                # The folder contains Webpack bundling file for production
-            └── index.js        
-        ├── source              # The folder contains the source code
-            ├── controller.ts   
-            ├── erpDataExchange.ts
-            ├── index.ts         
-            ├── interfaces.ts   
-            ├── model.ts        
-            ├── routes.ts       
-            ├── service.ts
-            └── wrikeDataExchange.ts  
-        ├── tests                          # The folder contains the unit tests 
-            ├── erpDataExchange.spec.ts    
-            ├── model.spec.ts              
-            └── service.spec.ts            
+    │    ├── dist               # The folder contains Webpack bundling file for production
+    │    │    └── index.js        
+    │    ├── source             # The folder contains the source code
+    │    │    ├── controller.ts   
+    │    │    ├── erpDataExchange.ts
+    │    │    ├── index.ts         
+    │    │    ├── interfaces.ts   
+    │    │    ├── model.ts        
+    │    │    ├── routes.ts       
+    │    │    ├── service.ts
+    │    │    └── wrikeDataExchange.ts  
+    │    └── tests              # The folder contains the unit tests 
+    │        ├── erpDataExchange.spec.ts    
+    │        ├── model.spec.ts              
+    │        └── service.spec.ts            
     ├── .eslintignore           
     ├── .eslintrc 
     ├── .gitignore   
@@ -68,7 +68,7 @@ Run `test:server` to execute the unit tests via [Jest](https://jestjs.io).
 
 ## Authentication
 
-The app uses the OAuth 2.0 protocol for authorization. For details, please see [RFC6749, 4.1.](https://tools.ietf.org/html/rfc6749#section-4.1).
+The app uses the OAuth 2.0 protocol for authorization. For details, please see [RFC6749, 4.1](https://tools.ietf.org/html/rfc6749#section-4.1).
 
 ## Deploy to Heroku
 You can also deploy this app to Heroku:
