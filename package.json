@@ -22,9 +22,7 @@
     "express": "^4.17.1",
     "googleapis": "^65.0.0",
     "helmet": "^3.21.3",
-    "nodemailer": "^6.4.11",
     "pg": "^8.4.0",
-    "rxjs": "~6.5.4",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {

@@ -235,7 +235,7 @@ class ErpHttpsService {
       key: this.certs.key,
       cert: this.certs.cert,
       passphrase: "",
-      rejectUnauthorized: false
+      rejectUnauthorized: true
     };
     // Return a new promise.
     return new Promise((resolve, reject) => {
