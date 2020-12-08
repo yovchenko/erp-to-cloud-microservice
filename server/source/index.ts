@@ -49,11 +49,12 @@ const server = app.listen(PORT, () =>
 );
 
 /**
- * Power BI's data refresh initialization
+ * ERP's data refresh initialization
  */
 
-const powerBiRefresh = new DataRefresh(23, 59, 86400000); //call the callback function every 24 hours
-powerBiRefresh.initInterval(async () => {
+const erpRefresh = new DataRefresh(23, 59, 86400000); // Call the callback function every 24 hours
+
+erpRefresh.initInterval(async () => {
   await checkErpData().catch(err => {
     console.log("ERP's information update error " + err);
   });
@@ -66,12 +67,12 @@ powerBiRefresh.initInterval(async () => {
 });
 
 /**
- * ERP's data refresh initialization
+ * Power BI's data refresh initialization
  */
 
-const erpRefresh = new DataRefresh(23, 59, 1800000); //call the callback function every 30 minutes
+const powerBiRefresh = new DataRefresh(23, 59, 1800000); // Call the callback function every 30 minutes
 
-erpRefresh.initInterval(async () => {
+powerBiRefresh.initInterval(async () => {
   await requestHttp("POST", process.env.POWER_BI_URL).catch((err: Error) => {
     console.log("Power BI's data refresh error " + err);
   });
