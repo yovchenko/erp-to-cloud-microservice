@@ -31,7 +31,8 @@ router.post(
         if (Array.isArray(req.body) && req.body.length) {
           req.body.forEach(checkEvent);
         }
-      }
+      } else 
+        res.status(401).end("Invalid Authentication Token");
 
       res.writeHead(200, { "X-Hook-Secret": hash });
       res.status(200).end();
