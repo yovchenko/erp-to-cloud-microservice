@@ -1,8 +1,8 @@
 /**
- * TypeScript export interfaces
+ * TypeScript export types
  */
 
-export interface CustomField {
+export type CustomField = {
   id: string;
   value: string;
   type?: string;
@@ -10,24 +10,24 @@ export interface CustomField {
   settings?: {
     inheritanceType: string;
   };
-}
+};
 
-export interface Folder {
+export type Folder = {
   kind: string;
   data: Project[];
-}
+};
 
-export interface Tasks {
+export type Tasks = {
   kind: string;
   data: Task[];
-}
+};
 
-export interface CustomFields {
+export type CustomFields = {
   kind: string;
   data: CustomField[];
-}
+};
 
-export interface Project {
+export type Project = {
   id: string;
   title: string;
   workflowId?: string;
@@ -35,9 +35,9 @@ export interface Project {
   childIds?: string[];
   customFields?: CustomField[];
   permalink?: string;
-}
+};
 
-export interface Task {
+export type Task = {
   id: string;
   title: string;
   parentIds: string[];
@@ -46,14 +46,14 @@ export interface Task {
   superTaskIds: string[];
   permalink: string;
   subTaskIds: [];
-}
+};
 
-export interface Users {
+export type Users = {
   kind: string;
   data: User[];
-}
+};
 
-export interface User {
+export type User = {
   id: string;
   firstName: string;
   lastName: string;
@@ -62,24 +62,24 @@ export interface User {
       email: string;
     }
   ];
-}
+};
 
-export interface BudgetResponse {
+export type BudgetResponse = {
   "#ns": string;
   "#type": string | "Empty";
   "#value": BudgetProject[];
-}
+};
 
-export interface BudgetProject {
+export type BudgetProject = {
   project: string;
   posted: boolean;
   number: string;
   amount: number;
   currency: string;
   efforts: BudgetSubProject[];
-}
+};
 
-export interface BudgetSubProject {
+export type BudgetSubProject = {
   N: string;
   product: string;
   productCode: string;
@@ -92,68 +92,68 @@ export interface BudgetSubProject {
   effortBudget: number;
   totalBudget: number;
   tripBudget: number;
-}
+};
 
-export interface BudgetData {
+export type BudgetData = {
   "#ns": string;
   "#type": string | "Empty";
   "#value": BudgetValue;
-}
+};
 
-export interface BudgetValue {
+export type BudgetValue = {
   message: string;
   projects: Array<string>;
-}
+};
 
-export interface SpecificationValue {
+export type SpecificationValue = {
   message: string;
   specifications: Array<string>;
-}
+};
 
-export interface BudgetMessage {
+export type BudgetMessage = {
   "#ns": string;
   "#type": string | "Empty";
   "#value": BudgetMessageValue[] | [];
-}
+};
 
-export interface BudgetMessageValue {
+export type BudgetMessageValue = {
   message: string;
   status: string | "sent";
   count: string;
-}
+};
 
-export interface BudgetDelete {
+export type BudgetDelete = {
   "#ns": string;
   "#type": string;
   "#value": {
     result: string | "success";
   };
-}
+};
 
-export interface LocalBudgetValue {
+export type LocalBudgetValue = {
   status: string;
   delete: boolean;
   value: BudgetValue | SpecificationValue;
-}
+};
 
-export interface BudgetTotal {
+export type BudgetTotal = {
   [key: string]: number;
-}
+};
 
-export interface GroupedProjects {
+export type GroupedProjects = {
   [key: string]: [Project];
-}
+};
 
-export interface SpaceInfo {
+export type SpaceInfo = {
   id: number;
   space_id: string;
   project_title: string;
   erp_work_type: string;
   workflow_id: string;
-}
+};
 
-export interface TableInfo {
+export type TableInfo = {
   urlMessage: string;
   urlData: string;
   columnHeaders: string[];
-}
+};

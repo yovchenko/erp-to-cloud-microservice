@@ -1,44 +1,38 @@
 import Model from "./model";
 import { GmailMessage, requestHttp } from "./service";
-import * as interfaces from "./interfaces";
+import * as types from "./types";
 require("dotenv").config();
 
 //The recursive function search for the root task Wrike's directory tree
-function loopParentTasks(
-  initId: string
-): Promise<null | interfaces.CustomField[]> {
-  const promise = new Promise<null | interfaces.CustomField[]>(
-    (resolve, reject) => {
-      (async function nextParentRequest(): Promise<void> {
-        await requestHttp(
-          "GET",
-          encodeURI(process.env.WRIKE_TASKS + "/" + initId)
-        )
-          .then((response: string) => {
-            const taskObj: interfaces.Tasks = JSON.parse(response);
-            if (
-              Array.isArray(taskObj.data[0].superTaskIds) &&
-              taskObj.data[0].superTaskIds.length
-            ) {
-              initId = taskObj.data[0].superTaskIds[0];
-            } else initId = null;
-            const res = filterCustomField(taskObj.data[0].customFields);
-            //Go to the next parent, If there are no elements which passed the filter
-            if (res.length === 0 && initId !== null) nextParentRequest();
-            else res.length === 0 ? resolve(null) : resolve(res);
-          })
-          .catch(() =>
-            reject("Internal error executing the function loopParentTasks!")
-          );
-      })();
-    }
-  );
+function loopParentTasks(initId: string): Promise<null | types.CustomField[]> {
+  const promise = new Promise<null | types.CustomField[]>((resolve, reject) => {
+    (async function nextParentRequest(): Promise<void> {
+      await requestHttp(
+        "GET",
+        encodeURI(process.env.WRIKE_TASKS + "/" + initId)
+      )
+        .then((response: string) => {
+          const taskObj: types.Tasks = JSON.parse(response);
+          if (
+            Array.isArray(taskObj.data[0].superTaskIds) &&
+            taskObj.data[0].superTaskIds.length
+          ) {
+            initId = taskObj.data[0].superTaskIds[0];
+          } else initId = null;
+          const res = filterCustomField(taskObj.data[0].customFields);
+          //Go to the next parent, If there are no elements which passed the filter
+          if (res.length === 0 && initId !== null) nextParentRequest();
+          else res.length === 0 ? resolve(null) : resolve(res);
+        })
+        .catch(() =>
+          reject("Internal error executing the function loopParentTasks!")
+        );
+    })();
+  });
   return promise;
 }
 
-function filterCustomField(
-  arr: interfaces.CustomField[]
-): interfaces.CustomField[] {
+function filterCustomField(arr: types.CustomField[]): types.CustomField[] {
   //the function returns an array of the custom fileds filtered by the Ids
   const fieldsArr = arr.filter(
     item =>
@@ -57,7 +51,7 @@ export function taskCreated(taskId: string): Promise<unknown> {
   const promise = new Promise<unknown>((resolve, reject) => {
     if (taskId === undefined || !taskId.length)
       reject("An invalid parameter was passed to the function taskCreated!");
-    let objTask: interfaces.Tasks;
+    let objTask: types.Tasks;
     requestHttp("GET", encodeURI(process.env.WRIKE_TASKS + "/" + taskId))
       .then(async (response: string) => {
         objTask = JSON.parse(response);
@@ -82,7 +76,7 @@ export function taskCreated(taskId: string): Promise<unknown> {
       .catch(error => {
         throw "The second step in the promise chain returns an error: " + error;
       })
-      .then((response: null | interfaces.CustomField[]) => {
+      .then((response: null | types.CustomField[]) => {
         if (response === null) {
           if (
             Array.isArray(objTask.data[0].superTaskIds) &&
@@ -96,7 +90,7 @@ export function taskCreated(taskId: string): Promise<unknown> {
       .catch(error => {
         throw "The third step in the promise chain returns an error: " + error;
       })
-      .then(async (response: null | interfaces.CustomField[]) => {
+      .then(async (response: null | types.CustomField[]) => {
         if (response !== null && response.length && response !== undefined) {
           const taskCustomField = JSON.stringify(response);
           const result = await requestHttp(
@@ -230,7 +224,7 @@ export function projectFieldChanged(
       .then((response: string) => {
         if (value === undefined) {
           //search for custom fields of the project
-          const folderObj: interfaces.Folder = JSON.parse(response);
+          const folderObj: types.Folder = JSON.parse(response);
           if (
             Array.isArray(folderObj.data[0].customFields) &&
             folderObj.data[0].customFields.length
@@ -336,7 +330,7 @@ async function getUsers(users: string): Promise<object[] | null> {
       encodeURI(process.env.WRIKE_API + "/users/" + arrValue[i])
     )
       .then((response: string) => {
-        const objUser: interfaces.Users = JSON.parse(response);
+        const objUser: types.Users = JSON.parse(response);
         usersData.push({
           userFullName:
             objUser.data[0].firstName + " " + objUser.data[0].lastName,
@@ -369,7 +363,7 @@ export function notifyUser(
       !objType.length
     )
       reject("An invalid parameter was passed to the function!");
-    let obj: interfaces.Tasks | interfaces.Folder;
+    let obj: types.Tasks | types.Folder;
     requestHttp(
       "GET",
       encodeURI(process.env.WRIKE_API + "/" + objType + "/" + objId)

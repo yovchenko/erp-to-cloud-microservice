@@ -4,7 +4,7 @@
 
 import { requestHttp, erpHttps } from "./service";
 import { sqlQuery } from "./model";
-import * as interfaces from "./interfaces";
+import * as types from "./types";
 import Model from "./model";
 require("dotenv").config();
 
@@ -13,8 +13,8 @@ require("dotenv").config();
  */
 
 //The function that update ERP's data information table in Wrike
-export function checkErpData(): Promise<interfaces.Tasks> {
-  const promise = new Promise<interfaces.Tasks>((resolve, reject) => {
+export function checkErpData(): Promise<types.Tasks> {
+  const promise = new Promise<types.Tasks>((resolve, reject) => {
     //request Wrike's space Id that is stored in the database
     return sqlQuery("SELECT space_id FROM Spaces WHERE title = '1C'")
       .then((response: [{ space_id: string }]) => {
@@ -49,13 +49,13 @@ export function checkErpData(): Promise<interfaces.Tasks> {
         throw "The second step in the promise chain returns an error: " + error;
       })
       .then(async (response: string) => {
-        const tasks: interfaces.Tasks = JSON.parse(response);
+        const tasks: types.Tasks = JSON.parse(response);
         //There are only two folders in the space
         const len = 2;
         if (response === null || response === undefined)
           throw "Wrike's space does not exist!";
         if (!tasks.data.length) throw "Wrike's space is empty!";
-        let table = { columnHeaders: [] } as interfaces.TableInfo;
+        let table = { columnHeaders: [] } as types.TableInfo;
         for (let index = 0; index < len; index++) {
           if (tasks.data[index].parentIds[0] === Model.se) {
             table.urlMessage = process.env.ERP_BUDGET_PATH_MESSAGE;
@@ -92,16 +92,11 @@ export function checkErpData(): Promise<interfaces.Tasks> {
 //The function updates description of Wrike's task that contains ERP's data
 async function updateErpDataTable(
   taskId: string,
-  table: interfaces.TableInfo
+  table: types.TableInfo
 ): Promise<unknown | Error> {
   return checkQueue(table.urlMessage, table.urlData)
     .then(
-      (
-        response:
-          | null
-          | [interfaces.BudgetValue]
-          | [interfaces.SpecificationValue]
-      ) => {
+      (response: null | [types.BudgetValue] | [types.SpecificationValue]) => {
         //Wrap the ERP's data into an HMLT table
         if (response === null || response === undefined) {
           if (!response.length) return "";
@@ -165,7 +160,7 @@ function checkQueue(messageUrl: string, dataUrl: string): Promise<unknown> {
       reject("An invalid parameter was passed to the function checkQueue!");
     }
     requestErpMessage(messageUrl)
-      .then(async (response: null | interfaces.BudgetMessageValue[]) => {
+      .then(async (response: null | types.BudgetMessageValue[]) => {
         //return an array of Ids or null
         if (response === null) {
           resolve(response);
@@ -198,8 +193,8 @@ function checkQueue(messageUrl: string, dataUrl: string): Promise<unknown> {
 export async function updateErpData(
   messageUrl: string,
   dataUrl: string
-): Promise<string | [interfaces.LocalBudgetValue]> {
-  const promise = new Promise<string | [interfaces.LocalBudgetValue]>(
+): Promise<string | [types.LocalBudgetValue]> {
+  const promise = new Promise<string | [types.LocalBudgetValue]>(
     (resolve, reject) => {
       if (
         messageUrl === undefined ||
@@ -211,7 +206,7 @@ export async function updateErpData(
       }
       //request ERP's data message from http-service
       return requestErpMessage(messageUrl)
-        .then(async (response: null | interfaces.BudgetMessageValue[]) => {
+        .then(async (response: null | types.BudgetMessageValue[]) => {
           const arr = [];
           if (response !== null) {
             const len = response.length;
@@ -219,10 +214,7 @@ export async function updateErpData(
               const result: {
                 status: string;
                 delete: boolean;
-                value:
-                  | interfaces.BudgetValue
-                  | []
-                  | interfaces.SpecificationValue;
+                value: types.BudgetValue | [] | types.SpecificationValue;
               } = {
                 status: "error",
                 delete: false,
@@ -248,7 +240,7 @@ export async function updateErpData(
           throw "The first step in the promise chain returns an error: " +
             error;
         })
-        .then(async (response: [interfaces.LocalBudgetValue]) => {
+        .then(async (response: [types.LocalBudgetValue]) => {
           //send ERP's data message to Wrike
           const len = response.length;
           if (!len) throw "The request returns an empty array!";
@@ -297,7 +289,7 @@ export async function updateErpData(
           throw "The second step in the promise chain returns an error: " +
             error;
         })
-        .then(async (response: [interfaces.LocalBudgetValue]) => {
+        .then(async (response: [types.LocalBudgetValue]) => {
           //delete ERP's data message
           try {
             response.sort((a, b) => Number(a) - Number(b));
@@ -337,7 +329,7 @@ function requestErpMessage(url: string): Promise<unknown> {
     }
     erpHttps
       .requestHttps("GET", url)
-      .then((response: interfaces.BudgetMessage | string) => {
+      .then((response: types.BudgetMessage | string) => {
         if (response["#type"] === "Empty") {
           resolve(null);
         } else {
@@ -377,7 +369,7 @@ function deleteErpMessage(messageNumber: string, url: string): Promise<string> {
 async function requestErpDataIds(
   message: string,
   url: string
-): Promise<interfaces.BudgetValue | [] | interfaces.SpecificationValue> {
+): Promise<types.BudgetValue | [] | types.SpecificationValue> {
   try {
     const response = await requestErpData(message, url);
     return response["#value"];
@@ -434,7 +426,7 @@ export function setBudgetData(
       throw "An invalid parameter was passed to the function setBudgetData!";
     let rootProjectBudget: number | null = null;
     let rootProjectId: string | null = null;
-    let totalBudgetGroupedBy: [interfaces.BudgetTotal] | null = null;
+    let totalBudgetGroupedBy: [types.BudgetTotal] | null = null;
     let result: string[] | [] = [];
     //request ERP's budget data for the project
     const erpData = erpHttps.requestHttps(
@@ -443,7 +435,7 @@ export function setBudgetData(
     );
     //ERP's budget data validation
     erpData
-      .then((response: interfaces.BudgetResponse) => {
+      .then((response: types.BudgetResponse) => {
         if (
           Object.prototype.hasOwnProperty.call(response["#value"][0], "error")
         ) {
@@ -470,7 +462,7 @@ export function setBudgetData(
       .catch(error => {
         throw "The first step in the promise chain returns an error: " + error;
       })
-      .then((response: interfaces.BudgetResponse) => {
+      .then((response: types.BudgetResponse) => {
         //request Wrike's root project with the given Id
         if (
           Object.prototype.hasOwnProperty.call(response["#value"][0], "number")
@@ -494,7 +486,7 @@ export function setBudgetData(
       })
       .then((response: string) => {
         //assign ERP's budget data to the root project
-        const folders: interfaces.Folder = JSON.parse(response);
+        const folders: types.Folder = JSON.parse(response);
         rootProjectId = findProjectRoot(folders);
         if (!rootProjectId.length || rootProjectId === null)
           throw "The root project was not found!";
@@ -537,7 +529,7 @@ export function setBudgetData(
 
       .then(async (response: string) => {
         //request Wrike's project childs without an order number
-        const folders: interfaces.Folder = JSON.parse(response);
+        const folders: types.Folder = JSON.parse(response);
         if (totalBudgetGroupedBy === null)
           throw "ERP's budget data was not found!";
         await setProjectsWithoutOrder(totalBudgetGroupedBy, folders)
@@ -575,7 +567,7 @@ export function setBudgetData(
       })
       .then(async (response: string) => {
         //assign ERP's budget data to the project childs
-        const folders: interfaces.Folder = JSON.parse(response);
+        const folders: types.Folder = JSON.parse(response);
         const groupedProjects = projectGroupBy(folders.data, "value");
         setProjectsWithOrder(totalBudgetGroupedBy, groupedProjects)
           .then((response: never[]) => {
@@ -606,8 +598,8 @@ export function setBudgetData(
 
 //The function that assigns ERP's budget data to Wrike's projects without an order number
 function setProjectsWithoutOrder(
-  totalBudget: Array<interfaces.BudgetTotal>,
-  projects: interfaces.Folder
+  totalBudget: Array<types.BudgetTotal>,
+  projects: types.Folder
 ): Promise<string[] | never[]> {
   const promise = new Promise<string[] | never[]>((resolve, reject) => {
     if (!totalBudget.length || !projects.data.length)
@@ -633,7 +625,7 @@ function setProjectsWithoutOrder(
         erpWorkType.join() +
         ")"
     )
-      .then(async (response: [interfaces.SpaceInfo]) => {
+      .then(async (response: [types.SpaceInfo]) => {
         //Compare tree arrays of grouped data then call the PUT method
         const sqlQueryLen = response.length;
         const projectLen = projects.data.length;
@@ -663,7 +655,7 @@ function setProjectsWithoutOrder(
                       )
                     )
                       .then((response: string) => {
-                        const folders: interfaces.Folder = JSON.parse(response);
+                        const folders: types.Folder = JSON.parse(response);
                         result.push(folders.data[0].id);
                       })
                       .catch(err => {
@@ -687,8 +679,8 @@ function setProjectsWithoutOrder(
 
 //The function that assigns ERP's budget data to Wrike's projects with an order number
 function setProjectsWithOrder(
-  totalBudget: [interfaces.BudgetTotal],
-  groupedProjects: interfaces.GroupedProjects
+  totalBudget: [types.BudgetTotal],
+  groupedProjects: types.GroupedProjects
 ): Promise<string[] | never[]> {
   const promise = new Promise<string[] | never[]>((resolve, reject) => {
     const len = Object.keys(groupedProjects).length;
@@ -698,13 +690,13 @@ function setProjectsWithOrder(
     return sqlQuery(
       "SELECT project_title, erp_work_type, workflow_id FROM Spaces_info"
     )
-      .then((response: [interfaces.SpaceInfo]) => {
+      .then((response: [types.SpaceInfo]) => {
         return response;
       })
       .catch(error => {
         throw "The first step in the promise chain returns an error: " + error;
       })
-      .then(async (response: [interfaces.SpaceInfo]) => {
+      .then(async (response: [types.SpaceInfo]) => {
         //Compare two arrays of grouped data then call the PUT method
         const responseLen = response.length;
         const result: string[] = [];
@@ -743,7 +735,7 @@ function setProjectsWithOrder(
                       )
                     )
                       .then((response: string) => {
-                        const folders: interfaces.Folder = JSON.parse(response);
+                        const folders: types.Folder = JSON.parse(response);
                         result.push(folders.data[0].id);
                       })
                       .catch(err => {
@@ -769,10 +761,10 @@ function setProjectsWithOrder(
 
 //The function returns an array of objects grouped by key
 function groupBy(
-  array: interfaces.BudgetSubProject[],
+  array: types.BudgetSubProject[],
   key: string
 ): {
-  [key: string]: [interfaces.BudgetSubProject];
+  [key: string]: [types.BudgetSubProject];
 } {
   return array.reduce((result, currentValue) => {
     // If an array already present for key, push it to the array. Else create an array and push the object
@@ -785,8 +777,8 @@ function groupBy(
 }
 
 function filterBudgetData(
-  arr: Array<interfaces.BudgetTotal>
-): Array<interfaces.BudgetTotal> {
+  arr: Array<types.BudgetTotal>
+): Array<types.BudgetTotal> {
   //the function returns an array of ERP's data filtered by work item types
   const fieldsArr = arr.filter(
     item =>
@@ -801,16 +793,16 @@ function filterBudgetData(
 
 //The function that summarize ERP's budget data
 function sumBudget(
-  budgetData: interfaces.BudgetSubProject[]
-): null | [interfaces.BudgetTotal] {
+  budgetData: types.BudgetSubProject[]
+): null | [types.BudgetTotal] {
   const len = budgetData.length;
   if (!len) return null;
   //ERP's data group by an order number
   const numberGroupedBy: {
-    [key: string]: [interfaces.BudgetSubProject];
+    [key: string]: [types.BudgetSubProject];
   } = groupBy(budgetData, "N");
-  let sumBudgetResult: interfaces.BudgetTotal = {};
-  const resultArr: [interfaces.BudgetTotal] = [{ null: 0 }];
+  let sumBudgetResult: types.BudgetTotal = {};
+  const resultArr: [types.BudgetTotal] = [{ null: 0 }];
   for (const property in numberGroupedBy) {
     const len = numberGroupedBy[property].length;
     for (let y = 0; y < len; y++) {
@@ -856,9 +848,9 @@ function sumBudget(
 
 //The function returns an array of Wrike's projects grouped by key
 export function projectGroupBy(
-  array: interfaces.Project[],
+  array: types.Project[],
   key: string
-): interfaces.GroupedProjects {
+): types.GroupedProjects {
   return array.reduce((result, currentValue) => {
     // If an array already present for key, push it to the array. Else create an array and push the object
     const len = currentValue.customFields.length;
@@ -878,7 +870,7 @@ export function projectGroupBy(
 }
 
 //The function search for the root of the project
-function findProjectRoot(folders: interfaces.Folder): string {
+function findProjectRoot(folders: types.Folder): string {
   const arr: string[] = [];
   const fieldsArr = folders.data.filter(item => {
     const len = item.parentIds.length;
